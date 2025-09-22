@@ -1,0 +1,43 @@
+// Part (b): Serialization and Deserialization of Student Object
+import java.io.*;
+
+class Student implements Serializable {
+    private static final long serialVersionUID = 1L; 
+    int id;
+    String name;
+    double marks;
+
+    public Student(int id, String name, double marks) {
+        this.id = id;
+        this.name = name;
+        this.marks = marks;
+    }
+
+    public void display() {
+        System.out.println("ID: " + id + ", Name: " + name + ", Marks: " + marks);
+    }
+}
+
+public class StudentSerializationDemo {
+    public static void main(String[] args) {
+
+        Student s1 = new Student(101, "Amit", 88.5);
+
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("student.dat"))) {
+            oos.writeObject(s1);
+            System.out.println("Student object serialized to student.dat");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("student.dat"))) {
+            Student s2 = (Student) ois.readObject();
+            System.out.println("Deserialized Student object:");
+            s2.display();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
