@@ -1,0 +1,117 @@
+// Part C: Menu-Based Employee Management System Using File Handling
+import java.io.*;
+import java.util.*;
+
+class Employee {
+    int id;
+    String name;
+    double salary;
+
+    Employee(int id, String name, double salary) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return id + "," + name + "," + salary;
+    }
+
+    static Employee fromString(String line) {
+        String[] parts = line.split(",");
+        return new Employee(
+            Integer.parseInt(parts[0]),
+            parts[1],
+            Double.parseDouble(parts[2])
+        );
+    }
+}
+
+public class Main {
+    static final String FILE_NAME = "employees.txt";
+
+    public static void addEmployee(Employee emp) throws IOException {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
+            bw.write(emp.toString());
+            bw.newLine();
+        }
+        System.out.println("Employee added!");
+    }
+
+    public static void viewEmployees() throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            System.out.println("ID\tName\tSalary");
+            while ((line = br.readLine()) != null) {
+                Employee emp = Employee.fromString(line);
+                System.out.println(emp.id + "\t" + emp.name + "\t" + emp.salary);
+            }
+        }
+    }
+
+    public static void searchEmployee(int searchId) throws IOException {
+        boolean found = false;
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Employee emp = Employee.fromString(line);
+                if (emp.id == searchId) {
+                    System.out.println("Found: " + emp.id + " " + emp.name + " " + emp.salary);
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) System.out.println("Employee with ID " + searchId + " not found.");
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n--- Employee Management System ---");
+            System.out.println("1. Add Employee");
+            System.out.println("2. View All Employees");
+            System.out.println("3. Search Employee by ID");
+            System.out.println("4. Exit");
+            System.out.print("Choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            try {
+                switch (choice) {
+                    case 1:
+                        System.out.print("Enter ID: ");
+                        int id = sc.nextInt();
+                        sc.nextLine();
+                        System.out.print("Enter Name: ");
+                        String name = sc.nextLine();
+                        System.out.print("Enter Salary: ");
+                        double salary = sc.nextDouble();
+                        Employee emp = new Employee(id, name, salary);
+                        addEmployee(emp);
+                        break;
+                    case 2:
+                        viewEmployees();
+                        break;
+                    case 3:
+                        System.out.print("Enter Employee ID: ");
+                        int searchId = sc.nextInt();
+                        searchEmployee(searchId);
+                        break;
+                    case 4:
+                        System.out.println("Exiting...");
+                        break;
+                    default:
+                        System.out.println("Invalid choice!");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } while (choice != 4);
+
+        sc.close();
+    }
+}
